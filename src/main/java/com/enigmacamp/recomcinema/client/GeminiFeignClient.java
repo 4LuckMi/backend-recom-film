@@ -13,7 +13,7 @@ import java.util.Map;
 )
 public interface GeminiFeignClient {
     @PostMapping("/v1/models/{model}:generateContent")    Map<String, Object> getRawRecommendations(
-            @PathVariable("model") String model, // Tambahkan ini
+            @PathVariable("model") String model,
             @RequestBody Map<String, Object> request
     );
 }

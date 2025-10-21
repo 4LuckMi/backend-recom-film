@@ -34,7 +34,6 @@ public class GeminiService {
                 "], rekomendasikan 3 film menarik dengan genre yang sesuai. " +
                 "Formatkan hasil dalam JSON dengan field title, genre, dan year.";
 
-        // Buat payload sesuai format Gemini API
         Map<String, Object> requestBody = Map.of(
                 "contents", List.of(
                         Map.of("parts", List.of(Map.of("text", prompt)))
@@ -45,15 +44,12 @@ public class GeminiService {
         GeminiDto.Response response;
         Map<String, Object> geminiResponse = geminiFeignClient.getRawRecommendations(geminiModel, requestBody);
         try {
-            // Ambil teks dari response Gemini
             String textResponse = extractTextFromGeminiResponse(geminiResponse);
 
-            // Bersihkan teks supaya valid JSON
             textResponse = textResponse
                     .replaceAll("(?s)^.*?\\[", "[")  // buang teks sebelum [
                     .replaceAll("]([^]]*)$", "]");   // buang teks setelah ]
 
-            // Parse jadi list film recommendation
             List<GeminiDto.FilmRecommendation> films =
                     mapper.readValue(textResponse, new TypeReference<List<GeminiDto.FilmRecommendation>>() {});
 
@@ -65,7 +61,6 @@ public class GeminiService {
             throw new RuntimeException("Failed to parse Gemini response", e);
         }
 
-        // 🔹 Simpan hasil ke user
         String recommendedFilms = response.getRecommendations().stream()
                 .map(GeminiDto.FilmRecommendation::getTitle)
                 .collect(Collectors.joining(", "));
@@ -75,7 +70,6 @@ public class GeminiService {
         return response;
     }
 
-    // 🔹 Helper method
     private String extractTextFromGeminiResponse(Map<String, Object> response) {
         try {
             var candidates = (List<Map<String, Object>>) response.get("candidates");
